@@ -101,7 +101,7 @@ getData().then(g =>{
       var circles = node.append("circle")
                       .attr("class","circle")
                       .attr("r", family_radius)
-                      .attr("fill", "white")
+                      .attr("fill", function(d) {if(d.label == "movie"){ return "blue"} else{ return "red"}})
                       .attr("stroke", "gold")
                       .attr("stroke-width","2px")
                    /* .on("mouseover", function(d){
