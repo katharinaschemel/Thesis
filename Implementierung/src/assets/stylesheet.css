@@ -1,9 +1,12 @@
 body {
 	background-image: url("isb.png");
 	background-repeat: no-repeat;
+	background-attachment: scroll;
+	background-position: 50% 50%;
 }
 
 .flex-container {
+	height: 100%;
 	display: flex;
 }
 
@@ -24,6 +27,42 @@ body {
 }
 
 .node { stroke: #222; stroke-width: 1.5px; }
-    .node.actor { fill: #888; }
-    .node.movie { fill: #BBB; }
-    .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
+.node.actor { fill: #888; }
+.node.movie { fill: #BBB; }
+.link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
+.svg {width: 100%; height: 100%}
+
+
+
+
+     text {
+        font: 10px sans-serif;
+    }
+
+    .circle-image{
+      border-radius: "50%";
+      background-color: pink;
+    }
+
+    .node text {
+      pointer-events: none;
+      font: 6px sans-serif;
+    }
+
+  circle.fixed {
+  fill: #F0F0F0
+    }
+
+    .tooltip {
+        visibility: hidden;
+        position: absolute;
+        text-align: left;
+        border: 0.5px solid lightgrey;
+        padding: 5px;
+        font: 10px sans-serif;
+        background: white;
+        border-radius: 4px;
+        pointer-events: none;
+        width: auto;
+        height: auto;
+    }

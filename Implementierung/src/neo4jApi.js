@@ -53,33 +53,83 @@ function getMovie(title) {
 }*/
 
 function getGraph() {
-  var session = driver.session();
-  return session.run(
-    'MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) \
-    RETURN m.title AS movie, collect(a.name) AS cast \
-    LIMIT {limit}', {limit: 100})
-    .then(results => {
-      session.close();
-      var nodes = [], rels = [], i = 0;
+  //var session = driver.session();
+  //return session.run(
+  //  'MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}', {limit: 100})
+  //  .then(results => {
+  //
+  //    session.close();
+
+  parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}').then(results => {
+    var nodes = [], rels = [], i = 0;
+
       results.records.forEach(res => {
+        
         nodes.push({title: res.get('movie'), label: 'movie'});
+        /*console.log(nodes[i].attr("cx", d => {
+          return d.x;
+        }));*/
+        
         var target = i;
         i++;
 
         res.get('cast').forEach(name => {
+
           var actor = {title: name, label: 'actor'};
           var source = _.findIndex(nodes, actor);
+
           if (source == -1) {
             nodes.push(actor);
             source = i;
             i++;
           }
+
           rels.push({source, target})
+
         })
       });
 
       return {nodes, links: rels};
-    });
+  });
+
+ //     var nodes = [], rels = [], i = 0;
+//
+// //     results.records.forEach(res => {
+// //       
+// //       nodes.push({title: res.get('movie'), label: 'movie'});
+// //       /*console.log(nodes[i].attr("cx", d => {
+// //         return d.x;
+// //       }));*/
+// //       
+// //       var target = i;
+// //       i++;
+//
+// //       res.get('cast').forEach(name => {
+//
+// //         var actor = {title: name, label: 'actor'};
+// //         var source = _.findIndex(nodes, actor);
+//
+// //         if (source == -1) {
+// //           nodes.push(actor);
+// //           source = i;
+// //           i++;
+// //         }
+//
+// //         rels.push({source, target})
+//
+// //       })
+// //     });
+//
+ //     return {nodes, links: rels};
+    
+}
+
+function parseCypherToDB(statement) {
+  var session = driver.session();
+  var results = session.run(statement, {limit: 100});
+  session.close();
+
+  return results;
 }
 
 //exports.searchMovies = searchMovies;
