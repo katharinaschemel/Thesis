@@ -60,7 +60,8 @@ function getGraph() {
   //
   //    session.close();
 
-  parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}').then(results => {
+  //parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS cast LIMIT {limit}').then(results => {
+  parseCypherToDB('MATCH (n) return n').then(results => {
     var nodes = [], rels = [], i = 0;
 
       results.records.forEach(res => {

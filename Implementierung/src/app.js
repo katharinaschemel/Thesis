@@ -232,15 +232,95 @@ function getGraph(records) {
         keys = records[0].keys;
     }
     
+    var i = 0;
     records.forEach(res => {
 
-      nodes.push({title: res.get(keys[0]), label: keys[0]});
+      //nodes.push({title: res.get(keys[0]), label: keys[0]});
 
-      var target = i;
-      i++;
+      var info = {Anzahl_Installationen: res.get('info').properties.Anzahl_Installationen,
+               Beschreibung: res.get('info').properties.Beschreibung,
+               Code: res.get('info').properties.Code,
+               Eingesetzt_seit: res.get('info').properties.Eingesetzt_seit,
+               Investitionsgroesse: res.get('info').properties.Investitionsgroesse,
+               Name: res.get('info').properties.Name,
+               Subsysteme: res.get('info').properties.Subsysteme};
 
+      var source = _.findIndex(nodes, info);
+
+      if(source == -1) {
+        nodes.push(info);
+        source = i;
+        i++;
+      }
+
+      var orga = {Name: res.get('orga').properties.Name,
+                  Uebergeordnete_Einheit: res.get('orga').properties.Uebergeordnete_Einheit};
+
+      var target = _.findIndex(nodes, orga);
+
+      if(target == -1) {
+        nodes.push(orga);
+        target = i;
+        i++;
+      }
+
+      edges.push({source, target});
+
+
+
+
+      var pers = {Name: res.get('pers').properties.Name};
+
+      var target = _.findIndex(nodes, pers);
+
+      if(target == -1) {
+        nodes.push(pers);
+        target = i;
+        i++;
+      }
+
+      edges.push({source, target});
+
+
+
+
+      var tech = {Beschreibung: res.get('tech').properties.Beschreibung,
+                  EndOfLife: res.get('tech').properties.EndOfLife,
+                  Name: res.get('tech').properties.Name};
+
+      var target = _.findIndex(nodes, tech);
+
+      if(target == -1) {
+        nodes.push(tech);
+        target = i;
+        i++;
+      }
+
+      edges.push({source, target});
+
+
+
+
+      var anza = {Name: res.get('anza').properties.Klasse};
+
+      var target = _.findIndex(nodes, anza);
+
+      if(target == -1) {
+        nodes.push(anza);
+        target = i;
+        i++;
+      }
+
+      edges.push({source, target});
+      
+
+      //edges.push({source, target});
+
+      /*res.get('tech').forEach(o => {
+        var value = o.properties.Name;
+      })
     
-      res.get(keys[1]).forEach(v => {
+      res.get('orga').forEach(v => {
 
         var value = {title: v, label: keys[1]};
         var source = _.findIndex(nodes, value);
@@ -252,7 +332,7 @@ function getGraph(records) {
         }
 
         edges.push({source, target})
-      })
+      })*/
       
     });
   return {nodes, edges};
@@ -261,7 +341,9 @@ function getGraph(records) {
 
 function getData() {
   return new Promise(resolve => {
-    parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}').then(results => {
+    //parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}').then(results => {
+    //parseCypherToDB('MATCH (i:Informationssystem)<-[verantwortlich]-(p:Person) return i,p').then(results => {
+    parseCypherToDB('MATCH (info:Informationssystem)-[:Eingesetzt_In]->(orga:Organisationseinheit), (info)<-[:verantwortlich]-(pers:Person), (info)-[:verwendet]->(tech:Technologie), (info)-[:besitzt]->(anza:Anzahl_Anwender) return info,orga,pers,tech,anza').then(results => {
       var g = getGraph(results.records); 
       resolve(g);  
     });
