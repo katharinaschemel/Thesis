@@ -54,18 +54,20 @@ getData().then(g =>{
 
       var family_radius = 15;
 
-      var repelForce = d3.forceManyBody().strength(-3000).distanceMax(450)
+      var repelForce = d3.forceManyBody().strength(-1000).distanceMax(450)
                        .distanceMin(85);
 
       var simulation = d3.forceSimulation()
                   //     .alphaDecay(0.04)
                   //     .velocityDecay(0.4)
                        .force("center", d3.forceCenter(width / 2, height / 2))
+                       .force("charge", d3.forceManyBody().strength(-100))
                        .force("xAxis",d3.forceX(width/2).strength(0.4))
                        .force("yAxis",d3.forceY(height/2).strength(0.6))
                        .force("repelForce",repelForce)
-                       .force("link", d3.forceLink()/*.id(function(d) { return d.id }).distance(dist).strength(1.5)*/)
-                       .force("collide",d3.forceCollide().radius(function(d) { return d.r * 20; }).iterations(10).strength(1));
+                       .force("link", d3.forceLink().distance(200))
+                       //.force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+                       
 
       function dist(d){
       //used by link force
@@ -78,9 +80,17 @@ getData().then(g =>{
         .data(edges)
         .enter()
         .append("line")
-        .attr("stroke-width", "4px")
-        .attr("stroke-dasharray", "6,6")
-      .attr("stroke", "gold");
+        .attr("class", function(d) {
+          switch (d.type) {
+                          case "Organisationseinheit": return "edgeOrga";
+                          case "Technologie": return "edgeTech";
+                          case "Anzahl_Anwender": return "edgeAnza";
+                          case "Person": return "edgePers";
+                          default: return "unknown";
+                        }})
+        //.attr("stroke-width", "4px")
+        //.attr("stroke-dasharray", "6,6")
+        //.attr("stroke", "gold");
 
       //draw the nodes with drag functionality
       var node = svg.selectAll("foo")
@@ -99,11 +109,20 @@ getData().then(g =>{
     */
 
       var circles = node.append("circle")
-                      .attr("class","circle")
+                      .attr("class",function(d) {
+                        switch (d.type) {
+                          case "Informationssystem": return "not-fixed info";
+                          case "Organisationseinheit": return "not-fixed orga";
+                          case "Technologie": return "not-fixed tech";
+                          case "Anzahl_Anwender": return "not-fixed anza";
+                          case "Person": return "not-fixed pers";
+                          default: return "unknown";
+                        }})
+                          //if(d.type == "Informationssystem") {return "fixed info"} else {return "not-fixed"}})
                       .attr("r", family_radius)
-                      .attr("fill", function(d) {if(d.label == "movie"){ return "blue"} else{ return "red"}})
-                      .attr("stroke", "gold")
-                      .attr("stroke-width","2px")
+                      //.attr("fill", function(d) {if(d.label == "movie"){ return "blue"} else{ return "red"}})
+                      //attr("stroke", "gold")
+                      //.attr("stroke-width","2px")
                    /* .on("mouseover", function(d){
                             if(d.type !== "family"){
                               //sets tooltip.  t_text = content in html
@@ -132,6 +151,9 @@ getData().then(g =>{
       simulation.nodes(nodes);
       simulation.force("link").links(edges);
 
+
+      
+
       //and define tick functionality
       simulation.on("tick", function() {
 
@@ -148,15 +170,17 @@ getData().then(g =>{
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
           d.fx = d.x;
           d.fy = d.y;
-        if(d.type == 'family'){
+        //if(d.type == 'Informationssystem'){
           //stickiness - toggles the class to fixed/not-fixed to trigger CSS
           var my_circle = d3.select(this).selectAll('circle')
-          if(my_circle.attr('class') == 'fixed'){
-            my_circle.attr("class","not-fixed")
+          //console.log(my_circle);
+          var classes = my_circle.attr('class').split(' ');
+          if(my_circle.attr('class') == "fixed " + classes[1]){
+            my_circle.attr("class","not-fixed " + classes[1])
           }else{
-            my_circle.attr("class","fixed")
+            my_circle.attr("class","fixed " + classes[1])
           }
-        }
+        //}
       }
 
       function dragged(d) {
@@ -168,7 +192,8 @@ getData().then(g =>{
          if (!d3.event.active) simulation.alphaTarget(0);
          //stickiness - unfixes the node if not-fixed or a person
          var my_circle = d3.select(this).selectAll('circle')
-         if(my_circle.attr('class') == 'not-fixed'){
+         var classes = my_circle.attr('class').split(' ');
+         if(my_circle.attr('class') == ("not-fixed " + classes[1])){
            d.fx = null;
            d.fy = null;
          }
@@ -243,7 +268,8 @@ function getGraph(records) {
                Eingesetzt_seit: res.get('info').properties.Eingesetzt_seit,
                Investitionsgroesse: res.get('info').properties.Investitionsgroesse,
                Name: res.get('info').properties.Name,
-               Subsysteme: res.get('info').properties.Subsysteme};
+               Subsysteme: res.get('info').properties.Subsysteme,
+               type: "Informationssystem"};
 
       var source = _.findIndex(nodes, info);
 
@@ -254,7 +280,8 @@ function getGraph(records) {
       }
 
       var orga = {Name: res.get('orga').properties.Name,
-                  Uebergeordnete_Einheit: res.get('orga').properties.Uebergeordnete_Einheit};
+                  Uebergeordnete_Einheit: res.get('orga').properties.Uebergeordnete_Einheit,
+                  type: "Organisationseinheit"};
 
       var target = _.findIndex(nodes, orga);
 
@@ -264,12 +291,15 @@ function getGraph(records) {
         i++;
       }
 
-      edges.push({source, target});
+      var type = "Organisationseinheit";
+
+      edges.push({source, target, type});
 
 
 
 
-      var pers = {Name: res.get('pers').properties.Name};
+      var pers = {Name: res.get('pers').properties.Name,
+                  type: "Person"};
 
       var target = _.findIndex(nodes, pers);
 
@@ -279,14 +309,17 @@ function getGraph(records) {
         i++;
       }
 
-      edges.push({source, target});
+      var type = "Person";
+
+      edges.push({source, target, type});
 
 
 
 
       var tech = {Beschreibung: res.get('tech').properties.Beschreibung,
                   EndOfLife: res.get('tech').properties.EndOfLife,
-                  Name: res.get('tech').properties.Name};
+                  Name: res.get('tech').properties.Name,
+                  type: "Technologie"};
 
       var target = _.findIndex(nodes, tech);
 
@@ -296,12 +329,15 @@ function getGraph(records) {
         i++;
       }
 
-      edges.push({source, target});
+      var type = "Technologie";
+
+      edges.push({source, target, type});
 
 
 
 
-      var anza = {Name: res.get('anza').properties.Klasse};
+      var anza = {Name: res.get('anza').properties.Klasse,
+                  type: "Anzahl_Anwender"};
 
       var target = _.findIndex(nodes, anza);
 
@@ -311,7 +347,9 @@ function getGraph(records) {
         i++;
       }
 
-      edges.push({source, target});
+      var type = "Anzahl_Anwender";
+
+      edges.push({source, target, type});
       
 
       //edges.push({source, target});

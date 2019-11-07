@@ -5,7 +5,7 @@ body {
 	background-position: 50% 50%;
 }
 
-.flex-container {
+/*.flex-container {
 	height: 100%;
 	display: flex;
 }
@@ -24,7 +24,7 @@ body {
 
 .mittig {
 	justify-content: center;
-}
+}*/
 
 .node { stroke: #222; stroke-width: 1.5px; }
 .node.actor { fill: #888; }
@@ -50,8 +50,52 @@ body {
     }
 
   circle.fixed {
-  fill: #F0F0F0
-    }
+    stroke: black
+  }
+
+  circle.not-fixed {
+    stroke: black
+  }
+
+  circle.info {
+    fill: blue;
+  }
+
+  circle.orga {
+    fill: green;
+  }
+
+  circle.tech {
+    fill: purple;
+  }
+
+  circle.pers {
+    fill: pink;
+  }
+
+  circle.anza {
+    fill: red;
+  }
+
+  line.edgeOrga {
+    stroke: green;
+    stroke-width: 1px;
+  }
+
+  line.edgeTech {
+    stroke: purple;
+    stroke-width: 1px;
+  }
+
+  line.edgePers {
+    stroke: pink;
+    stroke-width: 1px;
+  }
+
+  line.edgeAnza {
+    stroke: red;
+    stroke-width: 1px;
+  }
 
     .tooltip {
         visibility: hidden;
