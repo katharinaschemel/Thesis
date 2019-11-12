@@ -99,12 +99,13 @@ getData().then(g => {
       userClasses.forEach(c => {
         switch (c.anzaClass) {
           case "XXS (1)": nodes[c.source].radius = 5; break;
-          case "XS (10)": nodes[c.source].radius = 15; break;
-          case "S (50)": nodes[c.source].radius = 25; break;
-          case "M (100)": nodes[c.source].radius = 35; break;
-          case "L (500)": nodes[c.source].radius = 45; break;
-          case "XL (1000)": nodes[c.source].radius = 55; break;
-          case "XXL (10000)": nodes[c.source].radius = 65; break;
+          case "XS (10)": nodes[c.source].radius = 10; break;
+          case "S (50)": nodes[c.source].radius = 15; break;
+          case "M (100)": nodes[c.source].radius = 25; break;
+          case "L (500)": nodes[c.source].radius = 35; break;
+          case "XL (1000)": nodes[c.source].radius = 40; break;
+          case "XXL (10000)": nodes[c.source].radius = 45; break;
+          case "unbekannt": nodes[c.source].radius = 60; break;
         }
       })
 
