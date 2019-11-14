@@ -120,11 +120,11 @@ getData().then(g => {
           .on("drag", dragged)
           .on("end", dragended));
 
-      /*var tooltip = d3.select("body")
+      var tooltip = d3.select("body")
           .append("div")
           .attr("class", "tooltip")
           .html("");
-      */
+      
 
       node.append("circle")
         .attr("class", function (d) {
@@ -139,7 +139,7 @@ getData().then(g => {
         })
         .attr("r", function (d) {
           if (isNaN(d.radius)) {
-            d.radius = 10;
+            d.radius = 25;
           }
           return d.radius
         })
@@ -150,29 +150,30 @@ getData().then(g => {
       //.attr("fill", function(d) {if(d.label == "movie"){ return "blue"} else{ return "red"}})
       //attr("stroke", "gold")
       //.attr("stroke-width","2px")
-      /* .on("mouseover", function(d){
-               if(d.type !== "family"){
+       .on("mouseover", function(d){
+               if(d.type !== " "){
                  //sets tooltip.  t_text = content in html
-                 t_text = "<strong>" + titleCase(d.name) + "</strong><br>Age: " + d.age
-                 if(d.profession !== undefined){
+                 t_text = "<strong>" + (d.name) + "</strong><br>Name: " + d.name
+              //   if(d.type !== Informationssystem){
                    //only add profession if it is defined
-                   t_text += "<br>Profession: " + d.profession}
+                   t_text += "<br>Anzahl_Anwender: " + d.anza//}
+                   t_text += "<br>Typ: " + d.type
                  tooltip.html(t_text)
                  return tooltip.style("visibility", "visible");
                }  })
          .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
          .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
-       */
+ 
 
       //append labels
-      //var texts = node.append("text")
-      //  .style("fill", "black")
-      //  .attr("dx", 0)
-      //  .attr("dy", 50)
-      //  .attr("text-anchor","middle")
-      //  .text(function(d) {
-      //      return titleCase(d.title);
-      //  });
+      var texts = node.append("text")
+        .style("fill", "black")
+        .attr("dx", 0)
+        .attr("dy", 50)
+        .attr("text-anchor","middle")
+        .text(function(d) {
+            return (d.title);
+        });
 
       //finally - attach the nodes and the links to the simulation
       simulation.nodes(nodes);
@@ -268,7 +269,7 @@ getData().then(g => {
 
 function parseCypherToDB(statement) {
   var session = driver.session();
-  var results = session.run(statement, { limit: 200 });
+  var results = session.run(statement, { limit: 500 });
   session.close();
 
   return results;
