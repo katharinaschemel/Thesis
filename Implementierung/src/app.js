@@ -63,7 +63,7 @@ getData().then(g => {
         .force("yAxis", d3.forceY(height / 2).strength(0.6))
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
- //     .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+      //     .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
 
 
       /* function dist(d){
@@ -124,10 +124,10 @@ getData().then(g => {
           .on("end", dragended));
 
       var tooltip = d3.select("body")
-          .append("div")
-          .attr("class", "tooltip")
-          .html("");
-      
+        .append("div")
+        .attr("class", "tooltip")
+        .html("");
+
 
       node.append("circle")
         .attr("class", function (d) {
@@ -151,43 +151,53 @@ getData().then(g => {
         })
 
 
-      //if(d.type == "Informationssystem") {return "fixed info"} else {return "not-fixed"}})
+        
+        .on("mouseover", function (d) {
+          var t_text = "empty";
+          if (d.type !== " ") {
+            switch (d.type) {
+              case "Informationssystem":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>Beschreibung: " + d.Beschreibung;
+                t_text = t_text + "<br>Anzahl Installationen: " + d.Anzahl_Installationen;
+                t_text = t_text + "<br>Subsysteme: " + d.Subsysteme;
+                t_text = t_text + "<br>Investitionsgroesse: " + d.Investitionsgroesse;
+                t_text = t_text + "<br>Eingesetzt seit: " + d.Eingesetzt_seit;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Organisationseinheit":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>Uebergeordnete Einheit: " + d.Uebergeordnete_Einheit;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Technologie":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>Beschreibung: " + d.Beschreibung;
+                t_text = t_text + "<br>End of life: " + d.EndOfLife;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Person":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+            }
 
-      //.attr("fill", function(d) {if(d.label == "movie"){ return "blue"} else{ return "red"}})
-      //attr("stroke", "gold")
-      //.attr("stroke-width","2px")
-       .on("mouseover", function(d){
-               if(d.type !== " "){
-                 //sets tooltip.  t_text = content in html
-                 t_text = "<strong>" + (d.Name) + "</strong><br>Name: " + d.Name
-    /*          switch (d.Informationssystem) {
-                 case "Eingesetzt_seit": d.Eingesetzt_seit;
-                 case "Investitionsgroesse": d.Investitionsgroesse;
-                 case "Anzahl_Anwender": d.anzaClass;
-                 case "Name": d.Name;
-                 default: ;
-      } */
+            tooltip.html(t_text)
+            return tooltip.style("visibility", "visible");
+          }
+        })
+        .on("mousemove", function () { return tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px"); })
+        .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
 
-                 t_text += "<br>Eingesetzt seit: " + d.Eingesetzt_seit
-                 t_text += "<br>Investitionsgröße: " + d.Investitionsgroesse
-       //        t_text += "<br>End-of-Life: " + d.EndOfLife
-       //        t_text += "<br>Anzahl Anwender: " + d.radius
-                 t_text += "<br>Typ: " + d.type 
-                 tooltip.html(t_text)
-                 return tooltip.style("visibility", "visible");
-               }  })
-         .on("mousemove", function(){return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");})
-         .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
- 
 
       //append labels
       var texts = node.append("text")
         .style("fill", "black")
         .attr("dx", 0)
         .attr("dy", 50)
-        .attr("text-anchor","middle")
-        .text(function(d) {
-            return (d.title);
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+          return (d.title);
         });
 
       //finally - attach the nodes and the links to the simulation
@@ -307,64 +317,64 @@ function getGraph(records) {
 
 
 
-/*
-
-
-
-
-    var fachProz = {
-      Code: res.get('fachProz').properties.Code,
-      Name: res.get('fachproz').properties.Name,
-      Verantwortlich: res.get('fachProz').properties.Verantwortlich,
-      Standardkonformität: res.get('fachProz').properties.Standardkonformität,
-    };
-
-    var source = _.findIndex(nodes, fachProz);
-
-    if (target == -1) {
-      nodes.push(fachProz);
-      target = i;
-      i++;
-    }
-
-
-
-    var standards = {
-      Code: res.get('standards').properties.Code,
-      Art: res.get('standards').properties.Art,
-      Name: res.get('standards').properties.Name,
-      };
-
-    var source = _.findIndex(nodes, standards);
-
-    if (target == -1) {
-      nodes.push(standards);
-      target = i;
-      i++;
-    }
-
-
-
-    var standorte = {
-      Code: res.get('standorte').properties.Code,
-      Name: res.get('standorte').properties.Name,
-      PLZ: res.get('standorte').properties.PLZ,
-      Anschrift: res.get('standorte').properties.Anschrift,
-    };
-
-    var source = _.findIndex(nodes, standorte);
-
-    if (target == -1) {
-      nodes.push(standorte);
-      target = i;
-      i++;
-    }
-
-*/
-
-
-
+    /*
     
+    
+    
+    
+        var fachProz = {
+          Code: res.get('fachProz').properties.Code,
+          Name: res.get('fachproz').properties.Name,
+          Verantwortlich: res.get('fachProz').properties.Verantwortlich,
+          Standardkonformität: res.get('fachProz').properties.Standardkonformität,
+        };
+    
+        var source = _.findIndex(nodes, fachProz);
+    
+        if (target == -1) {
+          nodes.push(fachProz);
+          target = i;
+          i++;
+        }
+    
+    
+    
+        var standards = {
+          Code: res.get('standards').properties.Code,
+          Art: res.get('standards').properties.Art,
+          Name: res.get('standards').properties.Name,
+          };
+    
+        var source = _.findIndex(nodes, standards);
+    
+        if (target == -1) {
+          nodes.push(standards);
+          target = i;
+          i++;
+        }
+    
+    
+    
+        var standorte = {
+          Code: res.get('standorte').properties.Code,
+          Name: res.get('standorte').properties.Name,
+          PLZ: res.get('standorte').properties.PLZ,
+          Anschrift: res.get('standorte').properties.Anschrift,
+        };
+    
+        var source = _.findIndex(nodes, standorte);
+    
+        if (target == -1) {
+          nodes.push(standorte);
+          target = i;
+          i++;
+        }
+    
+    */
+
+
+
+
 
 
 
