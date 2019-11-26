@@ -63,7 +63,7 @@ getData().then(g => {
         .force("yAxis", d3.forceY(height / 2).strength(0.6))
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
-      //.force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+ //     .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
 
 
       /* function dist(d){
@@ -90,6 +90,9 @@ getData().then(g => {
             case "Technologie": return "edgeTech";
             case "Anzahl_Anwender": return "edgeAnza";
             case "Person": return "edgePers";
+            case "FachlicheProzesse": return "edgeFachProz";
+            case "Standards": return "edgeStandards";
+            case "Standorte": return "edgeStandorte";
             default: return "unknown";
           }
         })
@@ -104,8 +107,8 @@ getData().then(g => {
           case "M (100)": nodes[c.source].radius = 25; break;
           case "L (500)": nodes[c.source].radius = 35; break;
           case "XL (1000)": nodes[c.source].radius = 40; break;
-          case "XXL (10000)": nodes[c.source].radius = 45; break;
-          case "unbekannt": nodes[c.source].radius = 60; break;
+          case "XXL (10000)": nodes[c.source].radius = 50; break;
+          case "unbekannt": nodes[c.source].radius = 8; break;
         }
       })
 
@@ -134,6 +137,9 @@ getData().then(g => {
             case "Technologie": return "not-fixed tech";
             case "Anzahl_Anwender": return "not-fixed anza";
             case "Person": return "not-fixed pers";
+            case "FachlicheProzesse": return "not-fixed fachProz";
+            case "Standards": return "not-fixed standards";
+            case "Standorte": return "not-fixed standorte";
             default: return "unknown";
           }
         })
@@ -153,11 +159,20 @@ getData().then(g => {
        .on("mouseover", function(d){
                if(d.type !== " "){
                  //sets tooltip.  t_text = content in html
-                 t_text = "<strong>" + (d.name) + "</strong><br>Name: " + d.name
-              //   if(d.type !== Informationssystem){
-                   //only add profession if it is defined
-                   t_text += "<br>Anzahl_Anwender: " + d.anza//}
-                   t_text += "<br>Typ: " + d.type
+                 t_text = "<strong>" + (d.Name) + "</strong><br>Name: " + d.Name
+    /*          switch (d.Informationssystem) {
+                 case "Eingesetzt_seit": d.Eingesetzt_seit;
+                 case "Investitionsgroesse": d.Investitionsgroesse;
+                 case "Anzahl_Anwender": d.anzaClass;
+                 case "Name": d.Name;
+                 default: ;
+      } */
+
+                 t_text += "<br>Eingesetzt seit: " + d.Eingesetzt_seit
+                 t_text += "<br>Investitionsgröße: " + d.Investitionsgroesse
+       //        t_text += "<br>End-of-Life: " + d.EndOfLife
+       //        t_text += "<br>Anzahl Anwender: " + d.radius
+                 t_text += "<br>Typ: " + d.type 
                  tooltip.html(t_text)
                  return tooltip.style("visibility", "visible");
                }  })
@@ -289,6 +304,70 @@ function getGraph(records) {
 
     //nodes.push({title: res.get(keys[0]), label: keys[0]});
 
+
+
+
+/*
+
+
+
+
+    var fachProz = {
+      Code: res.get('fachProz').properties.Code,
+      Name: res.get('fachproz').properties.Name,
+      Verantwortlich: res.get('fachProz').properties.Verantwortlich,
+      Standardkonformität: res.get('fachProz').properties.Standardkonformität,
+    };
+
+    var source = _.findIndex(nodes, fachProz);
+
+    if (target == -1) {
+      nodes.push(fachProz);
+      target = i;
+      i++;
+    }
+
+
+
+    var standards = {
+      Code: res.get('standards').properties.Code,
+      Art: res.get('standards').properties.Art,
+      Name: res.get('standards').properties.Name,
+      };
+
+    var source = _.findIndex(nodes, standards);
+
+    if (target == -1) {
+      nodes.push(standards);
+      target = i;
+      i++;
+    }
+
+
+
+    var standorte = {
+      Code: res.get('standorte').properties.Code,
+      Name: res.get('standorte').properties.Name,
+      PLZ: res.get('standorte').properties.PLZ,
+      Anschrift: res.get('standorte').properties.Anschrift,
+    };
+
+    var source = _.findIndex(nodes, standorte);
+
+    if (target == -1) {
+      nodes.push(standorte);
+      target = i;
+      i++;
+    }
+
+*/
+
+
+
+    
+
+
+
     var info = {
       Anzahl_Installationen: res.get('info').properties.Anzahl_Installationen,
       Beschreibung: res.get('info').properties.Beschreibung,
@@ -307,6 +386,7 @@ function getGraph(records) {
       source = i;
       i++;
     }
+
 
     var orga = {
       Name: res.get('orga').properties.Name,
