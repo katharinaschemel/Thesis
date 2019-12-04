@@ -27,8 +27,6 @@ body {
 }*/
 
 .node { stroke: #222; stroke-width: 1.5px; }
-/*.node.actor { fill: #888; }
-.node.movie { fill: #BBB; } */
 .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
 .svg {width: 100%; height: 100%}
 
@@ -77,6 +75,20 @@ body {
     fill: red;
   }
 
+/*
+  circle.fachProz {
+    fill: rgb(0, 255, 213);
+  }
+
+  circle.Standards {
+    fill: rgb(251, 255, 0);
+  }
+
+  circle.Standorte {
+    fill: rgb(255, 0, 200);
+  }
+*/
+
   line.edgeOrga {
     stroke: green;
     stroke-width: 1px;
@@ -96,6 +108,23 @@ body {
     stroke: red;
     stroke-width: 1px;
   }
+
+/*
+  line.edgeFachProz {
+    stroke: rgb(0, 255, 213);
+    stroke-width: 1px;
+  }
+
+  line.edgeStandards {
+    stroke: rgb(251, 255, 0);
+    stroke-width: 1px;
+  }
+
+  line.edgeStandorte {
+    stroke: rgb(255, 0, 200);
+    stroke-width: 1px;
+  }
+*/
 
     .tooltip {
         visibility: hidden;

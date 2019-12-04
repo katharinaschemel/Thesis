@@ -151,7 +151,7 @@ getData().then(g => {
         })
 
 
-        
+
         .on("mouseover", function (d) {
           var t_text = "empty";
           if (d.type !== " ") {
@@ -180,6 +180,23 @@ getData().then(g => {
                 t_text = "<strong>" + (d.Name) + "</strong>";
                 t_text = t_text + "<br>Type: " + d.type;
                 break;
+              /*   case "Fachprozesse":
+                     t_text = "<strong>" + (d.Name) + "</strong>";
+                     t_text = t_text + "<br>Standardkonformität: " + d.Standardkonformität;
+                     t_text = t_text + "<br>Type: " + d.type;
+                     break;
+                   case "Standards":
+                     t_text = "<strong>" + (d.Art) + "</strong>";
+                     t_text = t_text + "<br>Name: " + d.Name;
+                     t_text = t_text + "<br>Type: " + d.type;
+                     break;
+                   case "Standorte":
+                     t_text = "<strong>" + (d.Name) + "</strong>";
+                     t_text = t_text + "<br>PLZ: " + d.PLZ;
+                     t_text = t_text + "<br>Anschrift: " + d.Anschrift;
+                     t_text = t_text + "<br>Type: " + d.type;
+                     break;
+               */
             }
 
             tooltip.html(t_text)
@@ -286,8 +303,6 @@ getData().then(g => {
 
 
 });
-
-
 
 
 
@@ -422,7 +437,6 @@ function getGraph(records) {
 
 
 
-
     var pers = {
       Name: res.get('pers').properties.Name,
       type: "Person"
@@ -514,6 +528,8 @@ function getGraph(records) {
 
 }
 
+// hier noch FachProz, Standards, Standorte eingeben!
+
 function getData() {
   return new Promise(resolve => {
     //parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}').then(results => {
@@ -525,6 +541,3 @@ function getData() {
 
   });
 }
-
-
-
