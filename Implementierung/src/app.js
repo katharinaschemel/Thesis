@@ -63,7 +63,7 @@ getData().then(g => {
         .force("yAxis", d3.forceY(height / 2).strength(0.6))
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
-      //     .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+  //    .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
 
 
       /* function dist(d){
