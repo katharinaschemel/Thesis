@@ -45,14 +45,14 @@ getNodesFromDB(stm)
 
 
   //defining the chart
-  var myChart = familyChart().nodes(nodes)
+  var myChart = graphChart().nodes(nodes)
     .links(edges);
 
   //defining the width and height of the svg
   var width = window.innerWidth;
   var height = window.innerHeight;
 
-  //drawing the svg and calling the familyChart opject.
+  //drawing the svg and calling the graphChart opject.
 
   d3.select('#graph').append("svg")
     .attr("width", width)
@@ -62,7 +62,7 @@ getNodesFromDB(stm)
 
 
 
-  function familyChart() {
+  function graphChart() {
 
 
     var nodes = [], links = [];

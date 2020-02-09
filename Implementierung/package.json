@@ -1,8 +1,8 @@
 {
-  "name": "movies-neo4j-javascript-driver",
+  "name": "Thesis_Katharina_Schemel",
   "version": "0.0.1",
-  "description": "Demo application using Neo4j Driver for Javascript",
-  "repository": "",
+  "description": "Visualisierung von IT-Konsolidierungsprojekten",
+  "repository": "https://github.com/katharinaschemel/Thesis",
   "license": "PRIVATE",
   "dependencies": {
     "lodash": "^4.15.0",
