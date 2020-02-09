@@ -75,56 +75,59 @@ body {
     fill: red;
   }
 
-/*
   circle.fachProz {
     fill: rgb(0, 255, 213);
   }
 
-  circle.Standards {
+  circle.Standard {
     fill: rgb(251, 255, 0);
   }
 
-  circle.Standorte {
+  circle.Standort {
     fill: rgb(255, 0, 200);
   }
-*/
 
-  line.edgeOrga {
+
+  line.Eingesetzt_In {
+    stroke: blue;
+    stroke-width: 1px;
+  }
+
+  line.besitzt {
+    stroke: blue;
+    stroke-width: 1px;
+  }
+
+  line.gehoert_zu {
     stroke: green;
     stroke-width: 1px;
   }
 
-  line.edgeTech {
-    stroke: purple;
-    stroke-width: 1px;
-  }
-
-  line.edgePers {
-    stroke: pink;
-    stroke-width: 1px;
-  }
-
-  line.edgeAnza {
-    stroke: red;
-    stroke-width: 1px;
-  }
-
-/*
-  line.edgeFachProz {
+  line.integriert {
     stroke: rgb(0, 255, 213);
     stroke-width: 1px;
   }
 
-  line.edgeStandards {
-    stroke: rgb(251, 255, 0);
+  line.liegt_am {
+    stroke: green;
     stroke-width: 1px;
   }
 
-  line.edgeStandorte {
-    stroke: rgb(255, 0, 200);
+  line.verantwortlich {
+    stroke: pink;
     stroke-width: 1px;
   }
-*/
+
+  line.verwendet_Standard {
+    stroke: blue;
+    stroke-width: 1px;
+  }
+
+  line.verwendet_Technologie {
+    stroke: blue;
+    stroke-width: 1px;
+  }
+
 
     .tooltip {
         visibility: hidden;
