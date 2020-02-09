@@ -9,11 +9,6 @@ var nodes = [];
 var edges = [];
 var userClasses = [];
 
-
-//defining the width and height of the svg
-var width = window.innerWidth;// default width
-var height = window.innerHeight;
-
 var stm = [];
 stm.push('match (info:Informationssystem) return info');
 stm.push('match (orga:Organisationseinheit) return orga');
