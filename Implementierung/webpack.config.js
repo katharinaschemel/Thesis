@@ -2,6 +2,7 @@
 
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 
 /**
  * Get configuration for Webpack
@@ -20,11 +21,10 @@ module.exports = {
 
   output: {
     filename: 'app.js',
-    path: './build/',
-    publicPatch: './build/'
+    path: path.resolve(__dirname, 'build')
+    
   },
 
-  debug: true,
   devtool: false,
 
   stats: {
@@ -37,23 +37,30 @@ module.exports = {
   ],
 
   resolve: {
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx']
+    extensions: ['.webpack.js', '.web.js', '.js', '.jsx'],
+	modules: [
+      path.resolve(__dirname,'node_modules')
+    ]
   },
 
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.css$/,
-        loader: 'style!css'
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
       {
         test:  /\.(jpe?g|png|gif|svg)$/i,
-        loader: 'file-loader?name=[name].[ext]'
+        use: [
+          {
+            loader: 'file-loader'
+          },
+		]
       },
       {
         test: /\.js|\.jsx/,
         exclude: /node_modules|bower_components/,
-        loader: 'babel'
+        loader: 'babel-loader'
       }
     ]
   }

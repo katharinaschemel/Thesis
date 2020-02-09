@@ -1,15 +1,10 @@
-//var api = require('./neo4jApi');
-const css = require('./assets/stylesheet.css')
-require('file?name=[name].[ext]!../node_modules/neo4j-driver/lib/browser/neo4j-web.min.js');
-//var Movie = require('./models/Movie');
-//var MovieCast = require('./models/MovieCast');
+require('./assets/stylesheet.css')
+require('file-loader?name=[name].[ext]!../node_modules/neo4j-driver/lib/browser/neo4j-web.min.js');
 var _ = require('lodash');
 
 var neo4j = window.neo4j.v1;
 var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "KaSc1905"));
 
-//var DBResult = parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}');
-//var records = DBResult.records;
 var nodes = [];
 var edges = [];
 var userClasses = [];
@@ -54,12 +49,12 @@ getNodesFromDB(stm)
     .links(edges);
 
   //defining the width and height of the svg
-  var width = window.innerWidth; // default width
+  var width = window.innerWidth;
   var height = window.innerHeight;
 
   //drawing the svg and calling the familyChart opject.
 
-  var svg = d3.select('#graph').append("svg")
+  d3.select('#graph').append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("background-color", "yellow")
@@ -70,7 +65,7 @@ getNodesFromDB(stm)
   function familyChart() {
 
 
-    var nodes = [], links = [] // default height
+    var nodes = [], links = [];
 
     function my(svg) {
 
@@ -79,8 +74,6 @@ getNodesFromDB(stm)
         .distanceMin(120);
 
       var simulation = d3.forceSimulation()
-        //     .alphaDecay(0.04)
-        //     .velocityDecay(0.4)
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("charge", d3.forceManyBody().strength(-100))
         .force("xAxis", d3.forceX(width / 2).strength(0.4))
@@ -88,13 +81,6 @@ getNodesFromDB(stm)
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
         .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
-
-
-      /* function dist(d){
-      //used by link force
-      return 100
-
-      } */
 
       var anzAnwenderEdges = []
       edges.forEach(res => {
@@ -135,29 +121,9 @@ getNodesFromDB(stm)
             case "verwendet_Technologie": return "verwendet_Technologie";
             default: return "unknown";
           }
-        })
-      //.attr("stroke-width", "4px")
-      //.attr("stroke-dasharray", "6,6")
-      //.attr("stroke", "gold");
-
-      
+        })      
 
       nodes = nodes.filter( ( el ) => !userClasses.includes( el ) );
-
-      
-      /*userClasses.forEach(c => {
-        switch (c.Klasse) {
-          case "XXS (1)": nodes[c.source].radius = 5; break;
-          case "XS (10)": nodes[c.source].radius = 10; break;
-          case "S (50)": nodes[c.source].radius = 15; break;
-          case "M (100)": nodes[c.source].radius = 25; break;
-          case "L (500)": nodes[c.source].radius = 35; break;
-          case "XL (1000)": nodes[c.source].radius = 40; break;
-          case "XXL (10000)": nodes[c.source].radius = 50; break;
-          case "unbekannt": nodes[c.source].radius = 8; break;
-        }
-      })*/
-
 
       //draw the nodes with drag functionality
       var node = svg.selectAll("foo")
@@ -195,8 +161,6 @@ getNodesFromDB(stm)
           }
           return d.radius
         })
-
-
 
         .on("mouseover", function (d) {
           var t_text = "empty";
@@ -270,9 +234,6 @@ getNodesFromDB(stm)
       simulation.nodes(nodes);
       simulation.force("link").links(edges);
 
-
-
-
       //and define tick functionality
       simulation.on("tick", function () {
 
@@ -287,19 +248,19 @@ getNodesFromDB(stm)
       function dragstarted(d) {
 
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+
         d.fx = d.x;
         d.fy = d.y;
-        //if(d.type == 'Informationssystem'){
+
         //stickiness - toggles the class to fixed/not-fixed to trigger CSS
         var my_circle = d3.select(this).selectAll('circle')
-        //console.log(my_circle);
         var classes = my_circle.attr('class').split(' ');
+
         if (my_circle.attr('class') == "fixed " + classes[1]) {
           my_circle.attr("class", "not-fixed " + classes[1])
         } else {
           my_circle.attr("class", "fixed " + classes[1])
         }
-        //}
       }
 
       function dragged(d) {
@@ -353,9 +314,6 @@ getNodesFromDB(stm)
 
 });
 
-
-
-
 function parseCypherToDB(statement) {
   return new Promise(resolve => {
     var session = driver.session();
@@ -380,7 +338,6 @@ function getGraph(res) {
   edges = generateRelations(res.resRelations, nodes);
 
   return { nodes, edges, userClasses };
-
 }
 
 
@@ -395,7 +352,6 @@ function generateNodes(results) {
   })
 
   return nodes;
-
 }
 
 function recordToNode(record) {
