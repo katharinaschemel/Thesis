@@ -1,41 +1,55 @@
-//var api = require('./neo4jApi');
-const css = require('./assets/stylesheet.css')
-require('file?name=[name].[ext]!../node_modules/neo4j-driver/lib/browser/neo4j-web.min.js');
-//var Movie = require('./models/Movie');
-//var MovieCast = require('./models/MovieCast');
+require('./assets/stylesheet.css')
+require('file-loader?name=[name].[ext]!../node_modules/neo4j-driver/lib/browser/neo4j-web.min.js');
 var _ = require('lodash');
 
 var neo4j = window.neo4j.v1;
 var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "KaSc1905"));
 
-//var DBResult = parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}');
-//var records = DBResult.records;
 var nodes = [];
 var edges = [];
 var userClasses = [];
 
+var stm = [];
+stm.push('match (info:Informationssystem) return info');
+stm.push('match (orga:Organisationseinheit) return orga');
+stm.push('match (pers:Person) return pers');
+stm.push('match (fachProz:Fachprozess) return fachProz');
+stm.push('match (standard:Standard) return standard');
+stm.push('match (standort:Standort) return standort');
+stm.push('match (tech:Technologie) return tech');
+stm.push('match (anza:Anzahl_Anwender) return anza');
 
-//defining the width and height of the svg
-var width = window.innerWidth;// default width
-var height = window.innerHeight;
+var rel = [];
+rel.push('match (source)-[:Eingesetzt_In]->(target) return source, target');
+rel.push('match (source)-[:besitzt]->(target) return source, target');
+rel.push('match (source)-[:gehoert_zu]->(target) return source, target');
+rel.push('match (source)-[:integriert]->(target) return source, target');
+rel.push('match (source)-[:liegt_am]->(target) return source, target');
+rel.push('match (source)-[:verantwortlich]->(target) return source, target');
+rel.push('match (source)-[:verwendet_Standard]->(target) return source, target');
+rel.push('match (source)-[:verwendet_Technologie]->(target) return source, target');
+  
 
-getData().then(g => {
+getNodesFromDB(stm)
+.then(resNodes => getRelationsFromDB(rel, resNodes))
+.then(res => getGraph(res))
+.then(g => {
   nodes = g.nodes;
   edges = g.edges;
   userClasses = g.userClasses;
 
 
   //defining the chart
-  var myChart = familyChart().nodes(nodes)
+  var myChart = graphChart().nodes(nodes)
     .links(edges);
 
   //defining the width and height of the svg
-  var width = window.innerWidth; // default width
+  var width = window.innerWidth;
   var height = window.innerHeight;
 
-  //drawing the svg and calling the familyChart opject.
+  //drawing the svg and calling the graphChart opject.
 
-  var svg = d3.select('#graph').append("svg")
+  d3.select('#graph').append("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("background-color", "yellow")
@@ -43,10 +57,10 @@ getData().then(g => {
 
 
 
-  function familyChart() {
+  function graphChart() {
 
 
-    var nodes = [], links = [] // default height
+    var nodes = [], links = [];
 
     function my(svg) {
 
@@ -55,52 +69,26 @@ getData().then(g => {
         .distanceMin(120);
 
       var simulation = d3.forceSimulation()
-        //     .alphaDecay(0.04)
-        //     .velocityDecay(0.4)
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("charge", d3.forceManyBody().strength(-100))
         .force("xAxis", d3.forceX(width / 2).strength(0.4))
         .force("yAxis", d3.forceY(height / 2).strength(0.6))
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
-  //    .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+        .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
 
-
-      /* function dist(d){
-      //used by link force
-      return 100
-
-      } */
-
-      /* var anzAnwenderEdges = []
+      var anzAnwenderEdges = []
       edges.forEach(res => {
 
-        if(res.type == "Anzahl_Anwender")
+        if(res.type == "besitzt") {
           anzAnwenderEdges.push(res)
-          edges.splice(edges.indexOf(res), 1)
-      }); */
+        }
+      });
 
-      var links = svg.selectAll("foo")
-        .data(edges)
-        .enter()
-        .append("line")
-        .attr("class", function (d) {
-          switch (d.type) {
-            case "Organisationseinheit": return "edgeOrga";
-            case "Technologie": return "edgeTech";
-            case "Anzahl_Anwender": return "edgeAnza";
-            case "Person": return "edgePers";
-            case "FachlicheProzesse": return "edgeFachProz";
-            case "Standards": return "edgeStandards";
-            case "Standorte": return "edgeStandorte";
-            default: return "unknown";
-          }
-        })
-      //.attr("stroke-width", "4px")
-      //.attr("stroke-dasharray", "6,6")
-      //.attr("stroke", "gold");
-      userClasses.forEach(c => {
-        switch (c.anzaClass) {
+      edges = edges.filter( ( el ) => !anzAnwenderEdges.includes( el ) );
+
+      anzAnwenderEdges.forEach(c => {
+        switch(nodes[c.target].Klasse) {
           case "XXS (1)": nodes[c.source].radius = 5; break;
           case "XS (10)": nodes[c.source].radius = 10; break;
           case "S (50)": nodes[c.source].radius = 15; break;
@@ -112,6 +100,25 @@ getData().then(g => {
         }
       })
 
+      var links = svg.selectAll("foo")
+        .data(edges)
+        .enter()
+        .append("line")
+        .attr("class", function (d) {
+          switch (d.type) {
+            case "Eingesetzt_In": return "Eingesetzt_In";
+            case "besitzt": return "besitzt";
+            case "gehoert_zu": return "gehoert_zu";
+            case "integriert": return "integriert";
+            case "liegt_am": return "liegt_am";
+            case "verantwortlich": return "verantwortlich";
+            case "verwendet_Standard": return "verwendet_Standard";
+            case "verwendet_Technologie": return "verwendet_Technologie";
+            default: return "unknown";
+          }
+        })      
+
+      nodes = nodes.filter( ( el ) => !userClasses.includes( el ) );
 
       //draw the nodes with drag functionality
       var node = svg.selectAll("foo")
@@ -137,9 +144,9 @@ getData().then(g => {
             case "Technologie": return "not-fixed tech";
             case "Anzahl_Anwender": return "not-fixed anza";
             case "Person": return "not-fixed pers";
-            case "FachlicheProzesse": return "not-fixed fachProz";
-            case "Standards": return "not-fixed standards";
-            case "Standorte": return "not-fixed standorte";
+            case "Fachprozess": return "not-fixed fachProz";
+            case "Standard": return "not-fixed standard";
+            case "Standort": return "not-fixed standort";
             default: return "unknown";
           }
         })
@@ -149,8 +156,6 @@ getData().then(g => {
           }
           return d.radius
         })
-
-
 
         .on("mouseover", function (d) {
           var t_text = "empty";
@@ -180,23 +185,26 @@ getData().then(g => {
                 t_text = "<strong>" + (d.Name) + "</strong>";
                 t_text = t_text + "<br>Type: " + d.type;
                 break;
-              /*   case "Fachprozesse":
-                     t_text = "<strong>" + (d.Name) + "</strong>";
-                     t_text = t_text + "<br>Standardkonformität: " + d.Standardkonformität;
-                     t_text = t_text + "<br>Type: " + d.type;
-                     break;
-                   case "Standards":
-                     t_text = "<strong>" + (d.Art) + "</strong>";
-                     t_text = t_text + "<br>Name: " + d.Name;
-                     t_text = t_text + "<br>Type: " + d.type;
-                     break;
-                   case "Standorte":
-                     t_text = "<strong>" + (d.Name) + "</strong>";
-                     t_text = t_text + "<br>PLZ: " + d.PLZ;
-                     t_text = t_text + "<br>Anschrift: " + d.Anschrift;
-                     t_text = t_text + "<br>Type: " + d.type;
-                     break;
-               */
+              case "Fachprozess":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>Standardkonformität: " + d.Standardkonformität;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Standard":
+                t_text = "<strong>" + (d.Art) + "</strong>";
+                t_text = t_text + "<br>Name: " + d.Name;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Standort":
+                t_text = "<strong>" + (d.Name) + "</strong>";
+                t_text = t_text + "<br>PLZ: " + d.PLZ;
+                t_text = t_text + "<br>Anschrift: " + d.Anschrift;
+                t_text = t_text + "<br>Type: " + d.type;
+                break;
+              case "Anzahl":
+                t_text = "<strong>TEST</strong>";
+                break;
+               
             }
 
             tooltip.html(t_text)
@@ -221,9 +229,6 @@ getData().then(g => {
       simulation.nodes(nodes);
       simulation.force("link").links(edges);
 
-
-
-
       //and define tick functionality
       simulation.on("tick", function () {
 
@@ -238,19 +243,19 @@ getData().then(g => {
       function dragstarted(d) {
 
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+
         d.fx = d.x;
         d.fy = d.y;
-        //if(d.type == 'Informationssystem'){
+
         //stickiness - toggles the class to fixed/not-fixed to trigger CSS
         var my_circle = d3.select(this).selectAll('circle')
-        //console.log(my_circle);
         var classes = my_circle.attr('class').split(' ');
+
         if (my_circle.attr('class') == "fixed " + classes[1]) {
           my_circle.attr("class", "not-fixed " + classes[1])
         } else {
           my_circle.attr("class", "fixed " + classes[1])
         }
-        //}
       }
 
       function dragged(d) {
@@ -304,240 +309,185 @@ getData().then(g => {
 
 });
 
-
-
-
 function parseCypherToDB(statement) {
-  var session = driver.session();
-  var results = session.run(statement, { limit: 500 });
-  session.close();
-
-  return results;
-}
-
-function getGraph(records) {
-
-  var nodes = [], edges = [], i = 0, userClasses = [];
-
-
-
-  /*  if (typeof records !== 'undefined' && records.length > 0) {
-       keys = records[0].keys;
-   } */
-
-  records.forEach(res => {
-
-    //nodes.push({title: res.get(keys[0]), label: keys[0]});
-
-
-
-
-    /*
-    
-    
-    
-    
-        var fachProz = {
-          Code: res.get('fachProz').properties.Code,
-          Name: res.get('fachproz').properties.Name,
-          Verantwortlich: res.get('fachProz').properties.Verantwortlich,
-          Standardkonformität: res.get('fachProz').properties.Standardkonformität,
-        };
-    
-        var source = _.findIndex(nodes, fachProz);
-    
-        if (target == -1) {
-          nodes.push(fachProz);
-          target = i;
-          i++;
-        }
-    
-    
-    
-        var standards = {
-          Code: res.get('standards').properties.Code,
-          Art: res.get('standards').properties.Art,
-          Name: res.get('standards').properties.Name,
-          };
-    
-        var source = _.findIndex(nodes, standards);
-    
-        if (target == -1) {
-          nodes.push(standards);
-          target = i;
-          i++;
-        }
-    
-    
-    
-        var standorte = {
-          Code: res.get('standorte').properties.Code,
-          Name: res.get('standorte').properties.Name,
-          PLZ: res.get('standorte').properties.PLZ,
-          Anschrift: res.get('standorte').properties.Anschrift,
-        };
-    
-        var source = _.findIndex(nodes, standorte);
-    
-        if (target == -1) {
-          nodes.push(standorte);
-          target = i;
-          i++;
-        }
-    
-    */
-
-
-
-
-
-
-
-    var info = {
-      Anzahl_Installationen: res.get('info').properties.Anzahl_Installationen,
-      Beschreibung: res.get('info').properties.Beschreibung,
-      Code: res.get('info').properties.Code,
-      Eingesetzt_seit: res.get('info').properties.Eingesetzt_seit,
-      Investitionsgroesse: res.get('info').properties.Investitionsgroesse,
-      Name: res.get('info').properties.Name,
-      Subsysteme: res.get('info').properties.Subsysteme,
-      type: "Informationssystem"
-    };
-
-    var source = _.findIndex(nodes, info);
-
-    if (source == -1) {
-      nodes.push(info);
-      source = i;
-      i++;
-    }
-
-
-    var orga = {
-      Name: res.get('orga').properties.Name,
-      Uebergeordnete_Einheit: res.get('orga').properties.Uebergeordnete_Einheit,
-      type: "Organisationseinheit"
-    };
-
-    var target = _.findIndex(nodes, orga);
-
-    if (target == -1) {
-      nodes.push(orga);
-      target = i;
-      i++;
-    }
-
-    var type = "Organisationseinheit";
-
-    var test = _.findIndex(edges, { source, target, type });
-    if (test == -1) {
-      edges.push({ source, target, type });
-    }
-
-
-
-
-    var pers = {
-      Name: res.get('pers').properties.Name,
-      type: "Person"
-    };
-
-    target = _.findIndex(nodes, pers);
-
-    if (target == -1) {
-      nodes.push(pers);
-      target = i;
-      i++;
-    }
-
-    type = "Person";
-
-    test = _.findIndex(edges, { source, target, type });
-    if (test == -1) {
-      edges.push({ source, target, type });
-    }
-
-
-
-
-    var tech = {
-      Beschreibung: res.get('tech').properties.Beschreibung,
-      EndOfLife: res.get('tech').properties.EndOfLife,
-      Name: res.get('tech').properties.Name,
-      type: "Technologie"
-    };
-
-    target = _.findIndex(nodes, tech);
-
-    if (target == -1) {
-      nodes.push(tech);
-      target = i;
-      i++;
-    }
-
-    type = "Technologie";
-
-    test = _.findIndex(edges, { source, target, type });
-    if (test == -1) {
-      edges.push({ source, target, type });
-    }
-
-
-
-    var anzaClass = res.get('anza').properties.Klasse;
-
-
-    /* target = _.findIndex(nodes, anza);
-
-    if(target == -1) {
-      nodes.push(anza);
-      target = i;
-      i++;
-    } */
-
-    type = "Anzahl_Anwender";
-
-    test = _.findIndex(userClasses, { source, anzaClass });
-    if (test == -1) {
-      userClasses.push({ source, anzaClass });
-    }
-
-
-    //edges.push({source, target});
-
-    /*res.get('tech').forEach(o => {
-      var value = o.properties.Name;
-    })
-  
-    res.get('orga').forEach(v => {
-
-      var value = {title: v, label: keys[1]};
-      var source = _.findIndex(nodes, value);
-
-      if (source == -1) {
-        nodes.push(value);
-        source = i;
-        i++;
-      }
-
-      edges.push({source, target})
-    })*/
-
-  });
-  return { nodes, edges, userClasses };
-
-}
-
-// hier noch FachProz, Standards, Standorte eingeben!
-
-function getData() {
   return new Promise(resolve => {
-    //parseCypherToDB('MATCH (m:Movie)<-[:ACTED_IN]-(a:Person) RETURN m.title AS movie, collect(a.name) AS actor LIMIT {limit}').then(results => {
-    //parseCypherToDB('MATCH (i:Informationssystem)<-[verantwortlich]-(p:Person) return i,p').then(results => {
-    parseCypherToDB('MATCH (info:Informationssystem)-[:Eingesetzt_In]->(orga:Organisationseinheit), (info)<-[:verantwortlich]-(pers:Person), (info)-[:verwendet]->(tech:Technologie), (info)-[:besitzt]->(anza:Anzahl_Anwender) return info,orga,pers,tech,anza').then(results => {
-      var g = getGraph(results.records);
-      resolve(g);
-    });
+    var session = driver.session();
+    var results = session.run(statement);
+    session.close();
+    resolve(results);
+  })
+}
 
+function getGraph(res) {
+
+  var nodes = [], edges = [],  userClasses = [];
+
+  nodes = generateNodes(res.resNodes);
+
+  nodes.forEach(n =>{
+    if(n.type == 'Anzahl') {
+      userClasses.push(n);
+    }
   });
+  
+  edges = generateRelations(res.resRelations, nodes);
+
+  return { nodes, edges, userClasses };
+}
+
+
+function generateNodes(results) {
+  var nodes = [];
+
+  results.forEach(r => {
+    r.records.forEach(record => {
+      var node = recordToNode(record.get(record.keys[0]));
+      nodes.push(node);
+    })    
+  })
+
+  return nodes;
+}
+
+function recordToNode(record) {
+  var i;
+  switch (record.labels[0]) {
+    case 'Informationssystem':
+      i = {
+        Anzahl_Installationen: record.properties.Anzahl_Installationen,
+        Beschreibung: record.properties.Beschreibung,
+        Code: record.properties.Code,
+        Eingesetzt_seit: record.properties.Eingesetzt_seit,
+        Investitionsgroesse: record.properties.Investitionsgroesse,
+        Name: record.properties.Name,
+        Subsysteme: record.properties.Subsysteme,
+        type: "Informationssystem"
+      };
+      break;
+    case 'Organisationseinheit':
+      i = {
+        Code: record.properties.Code,
+        Name: record.properties.Name,
+        type: "Organisationseinheit"
+      };
+      break;
+    case 'Person':
+      i = {
+        Name: record.properties.Name,
+        type: "Person"
+      };
+      break;
+    case 'Technologie':
+      i = {
+        Code: record.properties.Code,
+        Name: record.properties.Name,
+        Beschreibung: record.properties.Beschreibung,
+        EndOfLife: record.properties.EndOfLife,
+        type: "Technologie"
+      };
+      break;
+    case 'Anzahl_Anwender':
+      i = {
+        Klasse: record.properties.Klasse,
+        type: "Anzahl"
+      };
+      break;
+    case 'Standard':
+      i = {
+        Code: record.properties.Code,
+        Name: record.properties.Name,
+        Art: record.properties.Art,
+        type: "Standard"
+      };
+      break;
+    case 'Standort':
+      i = {
+        Code: record.properties.Code,
+        Name: record.properties.Name,
+        PLZ: record.properties.PLZ,
+        Anschrift: record.properties.Anschrift,
+        type: "Standort"
+      };
+      break;
+    case 'Fachprozess':
+      i = {
+        Code: record.properties.Code,
+        Name: record.properties.Name,
+        Verantwortlich: record.properties.Verantwortlich,
+        type: "Fachprozess"
+      };
+      break;
+  }
+  return i;
+}
+
+function parseStatementArray(stm) {
+  return new Promise(resolve => {
+    var test = [];
+    stm.reduce((chain, currentStatement) => {
+      var t = chain.then(() => parseCypherToDB(currentStatement));
+      test.push(t);
+      return t;
+    },Promise.resolve())
+
+  
+    resolve(Promise.all(test))
+  })
+}
+
+function getNodesFromDB(stm) {
+  return new Promise(resolve => {
+    parseStatementArray(stm).then(resNodes => {
+      resolve(resNodes);
+    })
+  })
+}
+
+function getRelationsFromDB(stm, resNodes) {
+  return new Promise(resolve => {
+    parseStatementArray(stm).then(resRelations => {
+      resolve({resNodes, resRelations});
+    })
+  })
+}
+
+function generateRelations(results, nodes) {
+  var edges = [];
+  results.forEach(result => {
+    result.records.forEach(relation => {
+      var source = _.findIndex(nodes, recordToNode(relation.get('source')));
+      var target = _.findIndex(nodes, recordToNode(relation.get('target')));
+      var type;
+      var test = [nodes[source].type, nodes[target].type]
+      
+      switch (test.toString()) {
+        case ['Informationssystem', 'Organisationseinheit'].toString():
+          type = 'Eingesetzt_In';
+          break;
+        case ['Informationssystem', 'Anzahl'].toString():
+          type = 'besitzt';
+          break;
+        case ['Organisationseinheit', 'Organisationseinheit'].toString():
+          type = 'gehoert_zu';
+          break;
+        case ['Fachprozess', 'Informationssystem'].toString():
+          type = 'integriert';
+          break;
+        case ['Organisationseinheit', 'Standort'].toString():
+          type = 'liegt_am';
+          break;
+        case ['Person', 'Informationssystem'].toString():
+          type = 'verantwortlich';
+          break;
+        case ['Informationssystem', 'Standard'].toString():
+          type = 'verwendet_Standard';
+          break;
+        case ['Informationssystem', 'Technologie'].toString():
+          type = 'verwendet_Technologie';
+          break;
+      }
+      edges.push({source, target, type});
+    });
+  });
+  return edges
 }
