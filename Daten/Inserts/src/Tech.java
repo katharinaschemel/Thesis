@@ -15,7 +15,7 @@ public class Tech {
 
 	public void writeNode(BufferedWriter writer) {
 
-		String a = "MERGE (:Technologie { Name: '" + this.name + "', Beschreibung: '" + this.beschreibung + "', EndOfLife: '" + this.endOfLife + "'});\n";
+		String a = "MERGE (:Technologie {Code: '" + this.code + "', Name: '" + this.name + "', Beschreibung: '" + this.beschreibung + "', EndOfLife: '" + this.endOfLife + "'});\n";
 
 		try {
 			writer.write(a);
