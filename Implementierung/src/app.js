@@ -55,11 +55,7 @@ getNodesFromDB(stm)
     .append("svg")
     .attr("preserveAspectRatio", "xMinYMin meet")
     .attr("viewBox", "0 0 " + width + " " + height)
-    //.attr("viewBox", "0 0 600 400")
     .classed("svg-content-responsive", true)
-    //.attr("width", width)
-    //.attr("height", height)
-    //.attr("background-color", "yellow")
     .call(myChart);
 
 
