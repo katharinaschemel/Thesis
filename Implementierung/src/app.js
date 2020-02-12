@@ -70,13 +70,13 @@ getNodesFromDB(stm)
 
       var simulation = d3.forceSimulation()
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("charge", d3.forceManyBody().strength(-100))
+        .force("charge", d3.forceManyBody().strength(-500))
         .force("xAxis", d3.forceX(width / 2).strength(0.4))
         .force("yAxis", d3.forceY(height / 2).strength(0.6))
         .force("repelForce", repelForce)
         .force("link", d3.forceLink().distance(200))
-        .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
-
+      .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+  //      .force("collide", d3.forceCollide().radius(function(d) {return d.r * 500; })) 
       var anzAnwenderEdges = []
       edges.forEach(res => {
 
@@ -125,10 +125,11 @@ getNodesFromDB(stm)
         .data(nodes)
         .enter()
         .append("g")
+ //     .text(function(d){return d.name)
         .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
-          .on("end", dragended));
+          .on("end", dragended)); 
 
       var tooltip = d3.select("body")
         .append("div")
@@ -222,7 +223,7 @@ getNodesFromDB(stm)
         .attr("dy", 50)
         .attr("text-anchor", "middle")
         .text(function (d) {
-          return (d.title);
+          return (d.Name);
         });
 
       //finally - attach the nodes and the links to the simulation
