@@ -49,10 +49,17 @@ getNodesFromDB(stm)
 
   //drawing the svg and calling the graphChart opject.
 
-  d3.select('#graph').append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("background-color", "yellow")
+  d3.select('#graph')
+    .append("div")
+    .classed("svg-container", true)
+    .append("svg")
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 " + width + " " + height)
+    //.attr("viewBox", "0 0 600 400")
+    .classed("svg-content-responsive", true)
+    //.attr("width", width)
+    //.attr("height", height)
+    //.attr("background-color", "yellow")
     .call(myChart);
 
 
@@ -64,18 +71,35 @@ getNodesFromDB(stm)
 
     function my(svg) {
 
+      svg.append("circle").attr("cx",100).attr("cy",100).attr("r", 6).attr("class", "info");
+      svg.append("text").attr("x", 120).attr("y", 105).text("Informationssystem").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",130).attr("r", 6).attr("class", "orga");
+      svg.append("text").attr("x", 120).attr("y", 135).text("Organisationseinheit").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",160).attr("r", 6).attr("class", "tech");
+      svg.append("text").attr("x", 120).attr("y", 165).text("Technologie").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",190).attr("r", 6).attr("class", "pers");
+      svg.append("text").attr("x", 120).attr("y", 195).text("Person").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",220).attr("r", 6).attr("class", "fachProz");
+      svg.append("text").attr("x", 120).attr("y", 225).text("Fachprozess").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",250).attr("r", 6).attr("class", "Standard");
+      svg.append("text").attr("x", 120).attr("y", 255).text("Standard").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("circle").attr("cx",100).attr("cy",280).attr("r", 6).attr("class", "Standort");
+      svg.append("text").attr("x", 120).attr("y", 285).text("Standort").style("font-size", "15px").attr("alignment-baseline","middle")
+      
 
-      var repelForce = d3.forceManyBody().strength(-1000).distanceMax(450)
-        .distanceMin(120);
+
+
+      var repelForce = d3.forceManyBody().strength(-500).distanceMax(450)
+        .distanceMin(200);
 
       var simulation = d3.forceSimulation()
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("charge", d3.forceManyBody().strength(-100))
         .force("xAxis", d3.forceX(width / 2).strength(0.4))
-        .force("yAxis", d3.forceY(height / 2).strength(0.6))
+        .force("yAxis", d3.forceY(height / 2).strength(1.2))
         .force("repelForce", repelForce)
-        .force("link", d3.forceLink().distance(200))
-        .force("collide", d3.forceCollide().radius(function(d) {return d.radius}))
+        .force("link", d3.forceLink())
+        .force("collide", d3.forceCollide().radius(function(d) {return (d.radius+10)}).iterations(10).strength(1))
 
       var anzAnwenderEdges = []
       edges.forEach(res => {
@@ -216,13 +240,13 @@ getNodesFromDB(stm)
 
 
       //append labels
-      var texts = node.append("text")
+      node.append("text")
         .style("fill", "black")
         .attr("dx", 0)
-        .attr("dy", 50)
+        .attr("dy", 2)
         .attr("text-anchor", "middle")
         .text(function (d) {
-          return (d.title);
+          return (d.Name);
         });
 
       //finally - attach the nodes and the links to the simulation

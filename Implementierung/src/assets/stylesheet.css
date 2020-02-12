@@ -1,30 +1,22 @@
-body {
-	background-image: url("isb.png");
-	background-repeat: no-repeat;
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding-bottom: 50%;
+  vertical-align: top;
+  overflow: hidden;
+  background-image: url("isb.png");
+  background-repeat: no-repeat;
 	background-attachment: scroll;
 	background-position: 50% 50%;
 }
 
-/*.flex-container {
-	height: 100%;
-	display: flex;
+.svg-content-responsive {
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 0;
 }
-
-.row {
-	flex-direction: row;
-}
-
-.column {
-	flex-direction: column;
-}
-
-.flex-item {
-	flex: auto;
-}
-
-.mittig {
-	justify-content: center;
-}*/
 
 .node { stroke: #222; stroke-width: 1.5px; }
 .link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
