@@ -84,7 +84,7 @@ getNodesFromDB(stm)
       
 
 
-
+      //Definition des Forcelayouts für die Darstellung des Graphen innerhalb der svg-Grafik
       var repelForce = d3.forceManyBody().strength(-500).distanceMax(450)
         .distanceMin(200);
 
