@@ -23,8 +23,6 @@ public class Info {
 		this.eingesetztIn = eingesetztIn;
 		this.standardkonformität = standardkonformität;
 	}
-
-	// hier FachProz, Standards, Standorte?
 	
 	public void writeNode(BufferedWriter writer) {
 		
