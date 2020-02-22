@@ -11,23 +11,23 @@ var userClasses = [];
 
 var stm = [];
 stm.push('match (info:Informationssystem) return info');
-stm.push('match (orga:Organisationseinheit) return orga');
+//stm.push('match (orga:Organisationseinheit) return orga');
 stm.push('match (pers:Person) return pers');
-stm.push('match (fachProz:Fachprozess) return fachProz');
-stm.push('match (standard:Standard) return standard');
-stm.push('match (standort:Standort) return standort');
-stm.push('match (tech:Technologie) return tech');
+//stm.push('match (fachProz:Fachprozess) return fachProz');
+//stm.push('match (standard:Standard) return standard');
+//stm.push('match (standort:Standort) return standort');
+//stm.push('match (tech:Technologie) return tech');
 stm.push('match (anza:Anzahl_Anwender) return anza');
 
 var rel = [];
-rel.push('match (source)-[:Eingesetzt_In]->(target) return source, target');
+//rel.push('match (source)-[:Eingesetzt_In]->(target) return source, target');
 rel.push('match (source)-[:besitzt]->(target) return source, target');
-rel.push('match (source)-[:gehoert_zu]->(target) return source, target');
-rel.push('match (source)-[:integriert]->(target) return source, target');
-rel.push('match (source)-[:liegt_am]->(target) return source, target');
+//rel.push('match (source)-[:gehoert_zu]->(target) return source, target');
+//rel.push('match (source)-[:integriert]->(target) return source, target');
+//rel.push('match (source)-[:liegt_am]->(target) return source, target');
 rel.push('match (source)-[:verantwortlich]->(target) return source, target');
-rel.push('match (source)-[:verwendet_Standard]->(target) return source, target');
-rel.push('match (source)-[:verwendet_Technologie]->(target) return source, target');
+//rel.push('match (source)-[:verwendet_Standard]->(target) return source, target');
+//rel.push('match (source)-[:verwendet_Technologie]->(target) return source, target');
   
 
 getNodesFromDB(stm)
