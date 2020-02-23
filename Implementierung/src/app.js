@@ -2,53 +2,58 @@ require('./assets/stylesheet.css')
 require('file-loader?name=[name].[ext]!../node_modules/neo4j-driver/lib/browser/neo4j-web.min.js');
 var _ = require('lodash');
 
+// Initialisierung des DB-Treibers
 var neo4j = window.neo4j.v1;
 var driver = neo4j.driver("bolt://localhost", neo4j.auth.basic("neo4j", "KaSc1905"));
 
+// Deklaration
 var nodes = [];
 var edges = [];
 var userClasses = [];
 
+// Definition Cypherstatements (Knoten)
 var stm = [];
 stm.push('match (info:Informationssystem) return info');
-//stm.push('match (orga:Organisationseinheit) return orga');
+stm.push('match (orga:Organisationseinheit) return orga');
 stm.push('match (pers:Person) return pers');
-//stm.push('match (fachProz:Fachprozess) return fachProz');
-//stm.push('match (standard:Standard) return standard');
-//stm.push('match (standort:Standort) return standort');
-//stm.push('match (tech:Technologie) return tech');
+stm.push('match (fachProz:Fachprozess) return fachProz');
+stm.push('match (standard:Standard) return standard');
+stm.push('match (standort:Standort) return standort');
+stm.push('match (tech:Technologie) return tech');
 stm.push('match (anza:Anzahl_Anwender) return anza');
 
+// Definition Cypherstatements (Kanten)
 var rel = [];
-//rel.push('match (source)-[:Eingesetzt_In]->(target) return source, target');
+rel.push('match (source)-[:Eingesetzt_In]->(target) return source, target');
 rel.push('match (source)-[:besitzt]->(target) return source, target');
-//rel.push('match (source)-[:gehoert_zu]->(target) return source, target');
-//rel.push('match (source)-[:integriert]->(target) return source, target');
-//rel.push('match (source)-[:liegt_am]->(target) return source, target');
+rel.push('match (source)-[:gehoert_zu]->(target) return source, target');
+rel.push('match (source)-[:integriert]->(target) return source, target');
+rel.push('match (source)-[:liegt_am]->(target) return source, target');
 rel.push('match (source)-[:verantwortlich]->(target) return source, target');
-//rel.push('match (source)-[:verwendet_Standard]->(target) return source, target');
-//rel.push('match (source)-[:verwendet_Technologie]->(target) return source, target');
+rel.push('match (source)-[:verwendet_Standard]->(target) return source, target');
+rel.push('match (source)-[:verwendet_Technologie]->(target) return source, target');
   
-
+// Start der JS-Routine
 getNodesFromDB(stm)
 .then(resNodes => getRelationsFromDB(rel, resNodes))
 .then(res => getGraph(res))
 .then(g => {
+  
+  //Zuweisung der aufbereiteten DB-Ergebnisse
   nodes = g.nodes;
   edges = g.edges;
   userClasses = g.userClasses;
 
 
-  //defining the chart
+  // Definition der Abbildung
   var myChart = graphChart().nodes(nodes)
     .links(edges);
 
-  //defining the width and height of the svg
+  // Definition der Breite und Höhe der SVG
   var width = window.innerWidth;
   var height = window.innerHeight;
 
-  //drawing the svg and calling the graphChart opject.
-
+  // Zeichnen der der SVG
   d3.select('#graph')
     .append("div")
     .classed("svg-container", true)
@@ -67,6 +72,7 @@ getNodesFromDB(stm)
 
     function my(svg) {
 
+      // Hinzufügen der Legende
       svg.append("circle").attr("cx",100).attr("cy",100).attr("r", 6).attr("class", "info");
       svg.append("text").attr("x", 120).attr("y", 105).text("Informationssystem").style("font-size", "15px").attr("alignment-baseline","middle")
       svg.append("circle").attr("cx",100).attr("cy",130).attr("r", 6).attr("class", "orga");
@@ -97,6 +103,7 @@ getNodesFromDB(stm)
         .force("link", d3.forceLink())
         .force("collide", d3.forceCollide().radius(function(d) {return (d.radius+10)}).iterations(10).strength(1))
 
+      // Extraktion der Kanten des Typs "besitzt" (Kannten werden nicht gezeichnet sondern unterschiedliche Größe der Knoten)
       var anzAnwenderEdges = []
       edges.forEach(res => {
 
@@ -105,8 +112,10 @@ getNodesFromDB(stm)
         }
       });
 
+      // Entfernen der extrahierten Kanten
       edges = edges.filter( ( el ) => !anzAnwenderEdges.includes( el ) );
 
+      // Setzen des Radius in abhängigkeit zu der Anzahl von Anwendern
       anzAnwenderEdges.forEach(c => {
         switch(nodes[c.target].Klasse) {
           case "XXS (1)": nodes[c.source].radius = 5; break;
@@ -120,6 +129,7 @@ getNodesFromDB(stm)
         }
       })
 
+      // Zeichnen der Kanten
       var links = svg.selectAll("foo")
         .data(edges)
         .enter()
@@ -138,9 +148,10 @@ getNodesFromDB(stm)
           }
         })      
 
+      // Entfernen der Knoten, welche die Klassen der Anwenderanzahl repräsentieren
       nodes = nodes.filter( ( el ) => !userClasses.includes( el ) );
 
-      //draw the nodes with drag functionality
+      // Zeichnen der Knoten
       var node = svg.selectAll("foo")
         .data(nodes)
         .enter()
@@ -150,12 +161,13 @@ getNodesFromDB(stm)
           .on("drag", dragged)
           .on("end", dragended)); 
 
+      // Hinzufügen des Tooltip
       var tooltip = d3.select("body")
         .append("div")
         .attr("class", "tooltip")
         .html("");
 
-
+      // Definition der Funktionalitäten von Knoten (Verschiebar, Mouseover, Mousemove, Mouseout)
       node.append("circle")
         .attr("class", function (d) {
           switch (d.type) {
@@ -176,7 +188,7 @@ getNodesFromDB(stm)
           }
           return d.radius
         })
-
+        // Definition der Tooltip-Informationen
         .on("mouseover", function (d) {
           var t_text = "empty";
           if (d.type !== " ") {
@@ -235,7 +247,7 @@ getNodesFromDB(stm)
         .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });
 
 
-      //append labels
+      // Zeichnen der Labels der Knoten
       node.append("text")
         .style("fill", "black")
         .attr("dx", 0)
@@ -245,11 +257,11 @@ getNodesFromDB(stm)
           return (d.Name);
         });
 
-      //finally - attach the nodes and the links to the simulation
+      // Verknüpfung der Knoten und Kanten mit der Simulation (Forcelayout)
       simulation.nodes(nodes);
       simulation.force("link").links(edges);
 
-      //and define tick functionality
+      // Definition der Tick-Funktion
       simulation.on("tick", function () {
 
         links.attr("x1", function (d) { return d.source.x; })
@@ -267,7 +279,9 @@ getNodesFromDB(stm)
         d.fx = d.x;
         d.fy = d.y;
 
-        //stickiness - toggles the class to fixed/not-fixed to trigger CSS
+        // Ändert die Klasse des Knotens (CSS) 
+        // fixed --> Bewegt sich nach Drag nicht mehr
+        // not-fixed --> Kann sich nahc Drag frei bewegen
         var my_circle = d3.select(this).selectAll('circle')
         var classes = my_circle.attr('class').split(' ');
 
@@ -285,7 +299,8 @@ getNodesFromDB(stm)
 
       function dragended(d) {
         if (!d3.event.active) simulation.alphaTarget(0);
-        //stickiness - unfixes the node if not-fixed or a person
+
+        // Löst den Knoten von der fixen Position
         var my_circle = d3.select(this).selectAll('circle')
         var classes = my_circle.attr('class').split(' ');
         if (my_circle.attr('class') == ("not-fixed " + classes[1])) {
@@ -329,6 +344,38 @@ getNodesFromDB(stm)
 
 });
 
+function getNodesFromDB(stm) {
+  return new Promise(resolve => {
+    parseStatementArray(stm).then(resNodes => {
+      resolve(resNodes);
+    })
+  })
+}
+
+function getRelationsFromDB(stm, resNodes) {
+  return new Promise(resolve => {
+    parseStatementArray(stm).then(resRelations => {
+      resolve({resNodes, resRelations});
+    })
+  })
+}
+
+// Übermittelt alle Abfragen des Arrays stm an die Datenbank
+function parseStatementArray(stm) {
+  return new Promise(resolve => {
+    var test = [];
+    stm.reduce((chain, currentStatement) => {
+      var t = chain.then(() => parseCypherToDB(currentStatement));
+      test.push(t);
+      return t;
+    },Promise.resolve())
+
+  
+    resolve(Promise.all(test))
+  })
+}
+
+// Überträgt ein Cypherstatement an die Datenbank und gibt die Datenbankantwort zurück
 function parseCypherToDB(statement) {
   return new Promise(resolve => {
     var session = driver.session();
@@ -338,6 +385,7 @@ function parseCypherToDB(statement) {
   })
 }
 
+// Erzeugt alle für den Graphen relevanten Daten
 function getGraph(res) {
 
   var nodes = [], edges = [],  userClasses = [];
@@ -355,7 +403,7 @@ function getGraph(res) {
   return { nodes, edges, userClasses };
 }
 
-
+// Konvertiert alle Knoten zu einem verarbeitbaren Knoten
 function generateNodes(results) {
   var nodes = [];
 
@@ -369,6 +417,7 @@ function generateNodes(results) {
   return nodes;
 }
 
+// Konvertiert eine DB-Rückgabe zu einem verarbeitbaren Knoten (Assoziatives Array)
 function recordToNode(record) {
   var i;
   switch (record.labels[0]) {
@@ -441,36 +490,7 @@ function recordToNode(record) {
   return i;
 }
 
-function parseStatementArray(stm) {
-  return new Promise(resolve => {
-    var test = [];
-    stm.reduce((chain, currentStatement) => {
-      var t = chain.then(() => parseCypherToDB(currentStatement));
-      test.push(t);
-      return t;
-    },Promise.resolve())
-
-  
-    resolve(Promise.all(test))
-  })
-}
-
-function getNodesFromDB(stm) {
-  return new Promise(resolve => {
-    parseStatementArray(stm).then(resNodes => {
-      resolve(resNodes);
-    })
-  })
-}
-
-function getRelationsFromDB(stm, resNodes) {
-  return new Promise(resolve => {
-    parseStatementArray(stm).then(resRelations => {
-      resolve({resNodes, resRelations});
-    })
-  })
-}
-
+// Konvertiert alle DB-Rückgabe zu verarbeitbaren Kanten
 function generateRelations(results, nodes) {
   var edges = [];
   results.forEach(result => {

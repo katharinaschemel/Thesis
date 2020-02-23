@@ -7,8 +7,8 @@
   overflow: hidden;
   background-image: url("isb.png");
   background-repeat: no-repeat;
-	background-attachment: scroll;
-	background-position: 50% 50%;
+  background-attachment: scroll;
+  background-position: 50% 50%;
 }
 
 .svg-content-responsive {
@@ -18,26 +18,24 @@
   left: 0;
 }
 
-.node { stroke: #222; stroke-width: 1.5px; }
-.link { stroke: #999; stroke-opacity: .6; stroke-width: 1px; }
 .svg {width: 100%; height: 100%}
-
-
-
-
-     text {
+    text {
         font: 10px sans-serif;
     }
 
-    .circle-image{
-      border-radius: "50%";
-      background-color: pink;
-    }
-
-    .node text {
-      pointer-events: none;
-      font: 6px sans-serif;
-    }
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    text-align: left;
+    border: 0.5px solid lightgrey;
+    padding: 5px;
+    font: 10px sans-serif;
+    background: white;
+    border-radius: 4px;
+    pointer-events: none;
+    width: auto;
+    height: auto;
+}
 
   circle.fixed {
     stroke: black
@@ -79,7 +77,6 @@
     fill: rgb(255, 0, 200);
   }
 
-
   line.Eingesetzt_In {
     stroke: blue;
     stroke-width: 1px;
@@ -119,18 +116,3 @@
     stroke: blue;
     stroke-width: 1px;
   }
-
-
-    .tooltip {
-        visibility: hidden;
-        position: absolute;
-        text-align: left;
-        border: 0.5px solid lightgrey;
-        padding: 5px;
-        font: 10px sans-serif;
-        background: white;
-        border-radius: 4px;
-        pointer-events: none;
-        width: auto;
-        height: auto;
-    }
